@@ -3,15 +3,10 @@ import sys
 import re
 import itertools
 
-###
-#
-# TODOS:
-#
-# + problems detecting attrs with special chars, i.e. tal:define
+### TODOS:
+# + problems detecting attrs with special chars, i.e. tal:define. escaping??
 # + probably problems with long pythony attr values
 # + what exactly do things return when they are empty/None?
-#
-###
 
 
 # for matching things
@@ -81,29 +76,33 @@ def get_text(line):
     except AttributeError:
         return None
 
-def do_the_stuf(line):
-    # all that stuff down below
-    pass
+def lex_line(line):
+    data = {}
+    line = line.rstrip('\r\n')
+    line, _, data['comment'] = line.partition('//')
+    data['indent'] = count_indent(line)
+    data['element'] = get_element(line)
+    data['content'] = get_content(line)
+    data['text'] = get_text(line)
+    data['attrs'] = get_attrs(line)
+    data['sugar'] = get_sugar(line)
+    return data
+
+def lex_file(path):
+    with open(path) as f:
+        for i, line in enumerate(f):
+            data = lex_line(line)
+            data['line'] = i + 1
+            yield data
 
 #TODO catch some syntax errors.
 
 if __name__ == "__main__":
-    #infile = "in.wax"
     try:
         infile = sys.argv[1]
     except IndexError:
         raise IndexError("You need to specify a file")
-    with open(infile) as f:
-        for i, line in enumerate(f):
-            data = {}
-            line = line.rstrip('\r\n')
-            line, _, data['comment'] = line.partition('//')
-            data['line'] = i + 1
-            data['indent'] = count_indent(line)
-            data['element'] = get_element(line)
-            data['content'] = get_content(line)
-            data['text'] = get_text(line)
-            data['attrs'] = get_attrs(line)
-            data['sugar'] = get_sugar(line)
-            print data
+
+    for i in lex_file(infile):
+        print i
 
