@@ -11,7 +11,7 @@ import itertools
 
 # for matching things
 whitespace = re.compile('\s+')
-word = re.compile('\w+')
+word = re.compile('[\w:]+')
 txtdlm = ':'
 attrdlm = '\|'
 text_str = '(?<=' + txtdlm + ' | ' + txtdlm + ')[\w\W]+'
