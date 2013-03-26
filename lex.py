@@ -8,22 +8,30 @@ import itertools
 # + probably problems with long pythony attr values
 # + what exactly do things return when they are empty/None?
 
+# Delimiters
+COMMENTDLM = '//'
+TXTDLM = ':'
 
 # for matching things
 whitespace = re.compile('\s+')
-word = re.compile('[\w:]+')
-txtdlm = ':'
+#word = re.compile('\w+')
+word = re.compile('\w[\w:]*\w|\w')
 attrdlm = '\|'
-text_str = '(?<=' + txtdlm + ' | ' + txtdlm + ')[\w\W]+'
+text_str = '(?<=' + TXTDLM + ' | ' + TXTDLM + ')[\w\W]+'
 text = re.compile(text_str)
 #text = re.compile('(?<=: | :)[\w\W]+')
-attr = re.compile('(?<=\|)[^'+ attrdlm + txtdlm + ']+')
+attr = re.compile('(?<=\|)[^'+ attrdlm + TXTDLM + ']+')
 
 #attribute sugar
 SUGAR_MAP = {
         '.': 'class',
         '#': 'id'
     }
+
+class AttrDict(dict):
+    def __init__(self, *args, **kwargs):
+        super(AttrDict, self).__init__(*args, **kwargs)
+        self.__dict__ = self
 
 def splitted(s, sep):
     # splits each in a list of strings on sep, then re-adds the sep onto the
@@ -37,7 +45,7 @@ def splitted(s, sep):
 
 def get_sugar(line):
     plain = line.lstrip()
-    plain, _, _ = plain.partition(':')
+    plain, _, _ = plain.partition(TXTDLM)
     plain, _, _ = plain.partition('|')
     parts = reduce(splitted, SUGAR_MAP.keys(), [plain])
     try:
@@ -58,9 +66,11 @@ def count_indent(line):
 def get_element(line):
     words = word.findall(line)
     try:
-        return words[0]
+        element = words[0]
     except IndexError:
         return None
+    else:
+        return element
 
 def get_content(line):
     return line.strip()
@@ -70,6 +80,12 @@ def get_attrs(line):
     return attrs
 
 def get_text(line):
+    try:
+        if line[0] == TXTDLM:
+            return line[1:]
+    except IndexError:
+        return None
+
     match = text.search(line)
     try:
         return match.group(0)
@@ -77,9 +93,9 @@ def get_text(line):
         return None
 
 def lex_line(line):
-    data = {}
+    data = AttrDict()
     line = line.rstrip('\r\n')
-    line, _, data['comment'] = line.partition('//')
+    line, _, data['comment'] = line.partition(COMMENTDLM)
     data['indent'] = count_indent(line)
     data['element'] = get_element(line)
     data['content'] = get_content(line)
