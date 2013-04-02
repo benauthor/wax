@@ -16,6 +16,7 @@ TXTDLM = ':'
 whitespace = re.compile('\s+')
 #word = re.compile('\w+')
 word = re.compile('\w[\w:]*\w|\w')
+#firstword = re.compile('^\w[\w:]*\w|^\w')
 attrdlm = '\|'
 text_str = '(?<=' + TXTDLM + ' | ' + TXTDLM + ')[\w\W]+'
 text = re.compile(text_str)
@@ -64,10 +65,10 @@ def count_indent(line):
         return (length / 4, length % 4)
 
 def get_element(line):
-    words = word.findall(line)
+    match = word.match(line)
     try:
-        element = words[0]
-    except IndexError:
+        element = match.group(0)
+    except AttributeError:
         return None
     else:
         return element
@@ -91,18 +92,28 @@ def get_text(line):
         return match.group(0)
     except AttributeError:
         return None
+    # do we need a final return none?
 
 def lex_line(line):
     data = AttrDict()
+    data['raw'] = line
+    # chomp the newlines
     line = line.rstrip('\r\n')
     line, _, data['comment'] = line.partition(COMMENTDLM)
     data['indent'] = count_indent(line)
+    # now we are done with the whitespace
+    line = line.strip()
     data['element'] = get_element(line)
     data['content'] = get_content(line)
     data['text'] = get_text(line)
     data['attrs'] = get_attrs(line)
     data['sugar'] = get_sugar(line)
+    data['children'] = []
     return data
+
+def lex_lines(text):
+    for line in iter(text.splitlines()):
+        yield lex_line(line)
 
 def lex_file(path):
     with open(path) as f:

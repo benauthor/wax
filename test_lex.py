@@ -1,5 +1,7 @@
 # coding: spec
 
+#from nost.tools import assert_raises
+
 from lex import lex_line
 
 """
@@ -185,5 +187,4 @@ describe "text":
 
     it "should be permitted at the start of a line":
         data = lex_line(":A word from our sponsor.")
-        print data
         assert data.text == "A word from our sponsor."
