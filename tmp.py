@@ -1,5 +1,6 @@
 import re
 from pprint import pprint as p
+from pprint import pformat as f
 
 whitespace = re.compile('\s+')
 
@@ -7,6 +8,9 @@ class AttrDict(dict):
     def __init__(self, *args, **kwargs):
         super(AttrDict, self).__init__(*args, **kwargs)
         self.__dict__ = self
+
+    def __repr__(self):
+        return f({'a-name': self.name, 'b-children': self.children})
 
 def count_indent(line):
     match = whitespace.match(line)
@@ -22,14 +26,14 @@ def count_indent(line):
 
 
 e = """
-n
+N
     n
-        n
-n
-n
+        u
+N
+N
     n
     n
-        n
+        u
     n
 """
 
@@ -38,6 +42,7 @@ root = AttrDict(indent=-1, children=[], name="ROOT")
 def makenode(line, lineno, prev):
     """tmp. make the object"""
     t = AttrDict()
+    t.name = line.strip()
     t.children = []
     t.parent = root
 #    t.line = line
