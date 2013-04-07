@@ -1,4 +1,5 @@
 import re
+import xml.etree.ElementTree as ET
 from pprint import pprint as p
 from pprint import pformat as f
 
@@ -10,7 +11,7 @@ class AttrDict(dict):
         self.__dict__ = self
 
     def __repr__(self):
-        return f({'a-name': self.name, 'b-children': self.children})
+        return f({'b-children': self.children, 'a-el': self.element} )
 
 def count_indent(line):
     match = whitespace.match(line)
@@ -37,7 +38,7 @@ N
     n
 """
 
-root = AttrDict(indent=-1, children=[], name="ROOT")
+root = AttrDict(indent=-1, children=[], name="ROOT", element=ET.Element('ROOT'))
 
 def makenode(line, lineno, prev):
     """tmp. make the object"""
@@ -48,6 +49,7 @@ def makenode(line, lineno, prev):
 #    t.line = line
     t.lineno = lineno
     t.indent = count_indent(line)
+    t.element = ET.Element(t.name)
     return t
 
 def parent_chain(indent, prev):
