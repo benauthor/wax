@@ -94,7 +94,7 @@ def get_text(line):
         return None
     # do we need a final return none?
 
-def lex_line(line):
+def analyze_line(line):
     data = AttrDict()
     data['raw'] = line
     # chomp the newlines
@@ -111,14 +111,14 @@ def lex_line(line):
     data['children'] = []
     return data
 
-def lex_lines(text):
+def analyze_lines(text):
     for line in iter(text.splitlines()):
-        yield lex_line(line)
+        yield analyze_line(line)
 
-def lex_file(path):
+def analyze_file(path):
     with open(path) as f:
         for i, line in enumerate(f):
-            data = lex_line(line)
+            data = analyze_line(line)
             data['line'] = i + 1
             yield data
 
@@ -130,6 +130,6 @@ if __name__ == "__main__":
     except IndexError:
         raise IndexError("You need to specify a file")
 
-    for i in lex_file(infile):
+    for i in analyze_file(infile):
         print i
 

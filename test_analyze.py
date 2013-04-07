@@ -2,7 +2,7 @@
 
 #from nost.tools import assert_raises
 
-from lex import lex_line
+from analyze import analyze_line
 
 """
 The XML spec is here:
@@ -96,11 +96,11 @@ A comment is a comment, but xml's are too type-y.
 """
 describe "comment":
     it "should identify a comment":
-        data = lex_line("something//a comment")
+        data = analyze_line("something//a comment")
         assert data.comment == "a comment"
 
     it "should be ignored by the parser":
-        data = lex_line("something//a comment")
+        data = analyze_line("something//a comment")
         assert "a comment" not in data.content
 
 
@@ -120,23 +120,23 @@ block of Wax. Just a simple, unadorned name.
 describe "element":
 
     it "should be identified in a line":
-        data = lex_line("div")
+        data = analyze_line("div")
         assert data.element == "div"
 
     it "should be indentified amongst whitespace":
-        data = lex_line("    p    ")
+        data = analyze_line("    p    ")
         assert data.element == "p"
 
     it "should be indentified amongst other words":
-        data = lex_line("wat is all this junk")
+        data = analyze_line("wat is all this junk")
         assert data.element == "wat"
 
     it "namespaced elements should not break":
-        data = lex_line("namespaced:thing")
+        data = analyze_line("namespaced:thing")
         assert data.element == "namespaced:thing"
 
     it "can have an underscore":
-        data = lex_line("a_nother")
+        data = analyze_line("a_nother")
         assert data.element == "a_nother"
 
 """
@@ -151,11 +151,11 @@ White space is significant. You indent your code anyways, so why not?
 """
 describe "indentation":
     it "should count four spaces per indent":
-        data = lex_line("    that was four")
+        data = analyze_line("    that was four")
         assert data.indent == (1, 0)
 
     it "should note off-multiple spacing":
-        data = lex_line("      there were six there")
+        data = analyze_line("      there were six there")
         assert data.indent == (1, 2)
 
 
@@ -169,22 +169,22 @@ What it's all about.
 """
 describe "text":
     it "should be permitted after an element":
-        data = lex_line("div: Hello, world!")
+        data = analyze_line("div: Hello, world!")
         assert data.text == "Hello, world!"
 
     it "should be permitted on a line of its own":
-        data = lex_line("    :Very nice.")
+        data = analyze_line("    :Very nice.")
         assert data.text == "Very nice."
 
     it "namespaced elements should not break with text":
-        data = lex_line("trees:elm: Awesome sauce.")
+        data = analyze_line("trees:elm: Awesome sauce.")
         assert data.element == "trees:elm"
         assert data.text == "Awesome sauce."
 
     it "should be ok to use a colon in text":
-        data = lex_line("element: Some text: it's great")
+        data = analyze_line("element: Some text: it's great")
         assert data.text == "Some text: it's great"
 
     it "should be permitted at the start of a line":
-        data = lex_line(":A word from our sponsor.")
+        data = analyze_line(":A word from our sponsor.")
         assert data.text == "A word from our sponsor."
