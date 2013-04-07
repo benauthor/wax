@@ -1,7 +1,7 @@
 # coding: spec
 
-from lex import lex_lines
-from parse import cluster, group_by_indent, group_recursive
+from wax.analyze import analyze_lines
+from wax.parse import cluster, group_by_indent, group_recursive
 
 describe "cluster":
     it "groups things":
@@ -21,7 +21,7 @@ p
 
 p
 """
-        result = list(group_by_indent(lex_lines(input), (0, 0)))
+        result = list(group_by_indent(analyze_lines(input), (0, 0)))
         assert len(result) == 3
 
     it "groups child nodes with parents":
@@ -36,7 +36,7 @@ parent
 parent
     child
 """
-        result = list(group_by_indent(lex_lines(input), (0, 0)))
+        result = list(group_by_indent(analyze_lines(input), (0, 0)))
         assert len(result) == 3
 
     it "groups n levels deep":
@@ -49,15 +49,15 @@ parent
         sub
             sub
 """
-        result = list(group_by_indent(lex_lines(input), (0, 0)))
+        result = list(group_by_indent(analyze_lines(input), (0, 0)))
         assert len(result) == 2
 
-    it "groups recursively":
-        input = """
-parent
-    child
-        sub
-"""
-        group_recursive(lex_lines(input))
-
-        assert False
+#    it "groups recursively":
+#        input = """
+#parent
+#    child
+#        sub
+#"""
+#        group_recursive(analyze_lines(input))
+#
+#        assert False

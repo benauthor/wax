@@ -2,7 +2,7 @@
 
 #from nost.tools import assert_raises
 
-from analyze import analyze_line
+from wax.analyze import analyze_line
 
 """
 The XML spec is here:

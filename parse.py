@@ -3,7 +3,7 @@ import sys
 from operator import add
 
 from itertools import ifilter
-from lex import lex_file, lex_lines
+from analyze import analyze_file, analyze_lines
 
 def cluster(iterable, func=lambda x, y: x != y):
     """Take an iterable and yield groups according to a rule.
@@ -61,7 +61,7 @@ if __name__ == "__main__":
 #    except IndexError:
 #        raise IndexError("You need to specify a file")
 
-#    for i in lex_file(infile):
+#    for i in analyze_file(infile):
 #        print i
 #        if not is_empty(i):
 #            if has_element(i):
