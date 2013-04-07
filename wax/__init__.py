@@ -1,4 +1,9 @@
+#USEFUL NOTE: http://www.packtpub.com/article/writing-a-package-in-python
+
 import xml.etree.ElementTree
+
+import analyze
+import parse
 
 class WaxElement(xml.etree.ElementTree.Element):
     """An abstract representation of a node in the tree
