@@ -18,7 +18,8 @@ It's way nicer to write
 than to type out all the brackets and quotes and crap. Ugh.
 
 
-This is still just a kernel of an idea. Check back hourly for exciting updates!
+This is still just a kernel of an idea. It does not actually work yet. Check
+back hourly for exciting updates!
 
 * * *
 
