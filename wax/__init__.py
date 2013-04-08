@@ -39,3 +39,4 @@ class WaxElement(ET.Element):
         indent = ' ' * config.SPACES_PER_INDENT * self.indent
         return "{indent}{tag}".format(indent=indent,
                                       tag=self.tag)
+

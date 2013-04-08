@@ -1,70 +1,95 @@
-import sys
+import re
+import xml.etree.ElementTree as ET
 
-from operator import add
+import __init__ as wax
 
-from itertools import ifilter
-from analyze import analyze_file, analyze_lines
+from analyze import count_indent
 
-def cluster(iterable, func=lambda x, y: x != y):
-    """Take an iterable and yield groups according to a rule.
+#whitespace = re.compile('\s+')
 
-    The function is applied to each consecutive pair of items in the iterable
-    in turn; when it returns true the accumulated group is yielded.
-    """
-    def next_or_none(iterable):
-        try:
-            return iterable.next()
-        except StopIteration:
-            return None
+#class AttrDict(dict):
+#    def __init__(self, *args, **kwargs):
+#        super(AttrDict, self).__init__(*args, **kwargs)
+#        self.__dict__ = self
+#
+#    def __repr__(self):
+#        return f({'b-children': self.children, 'a-el': self.element} )
 
-    group = []
-    lookahead = next_or_none(iterable)
-    while lookahead:
-        token = lookahead
-        lookahead = next_or_none(iterable)
-        group.append(token)
-        if func(token, lookahead):
-            yield group
-            group = []
+#def count_indent(line):
+#    match = whitespace.match(line)
+#    try:
+#        length = len(match.group(0))
+#    except AttributeError:
+#        return 0
+#    else:
+#            if length % 4 != 0:
+#            raise Exception('bad indent')
+#        # maybe throw error on modulo != 0 ???
+#        return length / 4
 
-def has_element(data):
-    return data.element
 
-def has_text(data):
-    return data.text
 
-def is_empty(data):
-    return not data.content
 
-def group_by_indent(data, indent):
-    def compare(x,y):
-        try:
-            return y.indent == indent
-        except:
-            return True
-    for i in cluster(ifilter(lambda x: x.content, data), compare):
-        yield i
 
-def group_recursive(data, indent=(0,0)):
-    for j in group_by_indent(data, indent):
-        if len(j) > 1:
-            j[0].children = j[1:]
-            print j
-#        for i in j: 
-#            group_recursive(i, tuple(map(add, indent, (1,0))))
-#            print (i.indent, i.element, i.children)
+def makenode(line, lineno, prev):
+    """tmp. make the object"""
+    name = line.strip()
+    indent, _ = count_indent(line)
+    return wax.WaxElement(tag=name, parent=root, line_num=lineno, indent=indent)
+
+def parent_chain(indent, prev):
+    """recursively walk the parent chain and return the parent at given indent"""
+    if indent == prev.indent:
+        return prev.parent
+    else:
+        return parent_chain(indent, prev.parent)
+
+def sortit(t, prev):
+    """given previous, decide what to do."""
+    if t.indent > prev.indent:
+        # if my indent is greater than prev, i am a child of prev
+        prev.add_child(t)
+        t.parent = prev
+    elif t.indent == prev.indent:
+        # if my indent is same as prev, i am a child of whatever prev is a child of
+        t.parent = prev.parent
+        t.parent.add_child(t)
+    else:
+        # my indent is smaller than prev.
+        t.parent = parent_chain(t.indent, prev)
+        t.parent.add_child(t)
+
+
 
 if __name__ == "__main__":
-    pass
 #    try:
 #        infile = sys.argv[1]
 #    except IndexError:
 #        raise IndexError("You need to specify a file")
+    e = """
+    N
+        n
+            u
+    N
+    N
+        n
+        n
+            u
+        n
+    """
 
-#    for i in analyze_file(infile):
-#        print i
-#        if not is_empty(i):
-#            if has_element(i):
-#                print ('ELEMENT', i.element)
-#            if has_text(i):
-#                print ('TEXT', i.text)
+    print e
+
+    root = wax.WaxDocument()
+    prev = root
+    lineno = 0
+    for line in e.splitlines():
+        lineno += 1
+        if line:
+            n = makenode(line, lineno, prev)
+            print n.indent
+            sortit(n, prev)
+            prev = n
+
+
+    print list(root.xml())

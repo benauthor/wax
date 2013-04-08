@@ -62,6 +62,8 @@ def count_indent(line):
         return (0, 0)
     else:
         # maybe throw error on modulo != 0 ???
+        #if length % 4 != 0:
+        #    raise Exception('bad indent')
         return (length / 4, length % 4)
 
 def get_element(line):
