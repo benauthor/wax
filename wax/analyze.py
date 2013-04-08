@@ -124,6 +124,7 @@ def analyze_file(path):
 
 #TODO catch some syntax errors.
 
+#TODO the following will not be necessary later
 if __name__ == "__main__":
     try:
         infile = sys.argv[1]
