@@ -35,7 +35,7 @@ def makenode(line, lineno, prev):
     """tmp. make the object"""
     name = line.strip()
     indent, _ = count_indent(line)
-    return wax.WaxElement(tag=name, parent=root, line_num=lineno, indent=indent)
+    return wax.WaxElement(tag=name, parent=None, line_num=lineno, indent=indent)
 
 def parent_chain(indent, prev):
     """recursively walk the parent chain and return the parent at given indent"""
@@ -48,6 +48,7 @@ def sortit(t, prev):
     """given previous, decide what to do."""
     if t.indent > prev.indent:
         # if my indent is greater than prev, i am a child of prev
+        # TODO attributes may be on consecutive lines
         prev.add_child(t)
         t.parent = prev
     elif t.indent == prev.indent:
@@ -60,6 +61,17 @@ def sortit(t, prev):
         t.parent.add_child(t)
 
 
+def parse_lines(iterable):
+    root = wax.WaxDocument()
+    prev = root
+    lineno = 0
+    for line in iterable:
+        lineno += 1
+        if line.strip(): # empty lines are allowed
+            n = makenode(line, lineno, prev)
+            sortit(n, prev)
+            prev = n
+    return root
 
 if __name__ == "__main__":
 #    try:
@@ -72,6 +84,7 @@ if __name__ == "__main__":
             u
     N
     N
+
         n
         n
             u
@@ -79,17 +92,5 @@ if __name__ == "__main__":
     """
 
     print e
-
-    root = wax.WaxDocument()
-    prev = root
-    lineno = 0
-    for line in e.splitlines():
-        lineno += 1
-        if line:
-            n = makenode(line, lineno, prev)
-            print n.indent
-            sortit(n, prev)
-            prev = n
-
-
-    print list(root.xml())
+    document = parse_lines(e.splitlines())
+    print list(document.xml())
