@@ -28,3 +28,7 @@ You'll need the noseOfYeti and nosetests packages. I like pinocchio too, for
 its nice spec-style output. I run tests like this:
 
     nosetests --with-noy --with-spec --spec-color
+
+* * *
+
+Python 2.7 FTW
