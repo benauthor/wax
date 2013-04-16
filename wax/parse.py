@@ -81,10 +81,10 @@ if __name__ == "__main__":
     a_string = ''.join(document.xml())
     print a_string
 
-    #haxx for pretty-ish printing
-    from lxml import etree as LET
-    root = LET.fromstring("<root>%s</root>" % a_string)
-    print LET.tostring(root, pretty_print=True)
+    # TODO proper prettification
+    from xml.dom import minidom
+    xml = minidom.parseString("<root>%s</root>" % a_string)
+    print xml.toprettyxml()
 
     for i in analyze_file(infile):
         print i
