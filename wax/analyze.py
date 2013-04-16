@@ -79,7 +79,13 @@ def get_content(line):
     return line.strip()
 
 def get_attrs(line):
-    attrs = attr.findall(line)
+    raw = attr.findall(line)
+    attrs = {}
+    for i in raw:
+        if ' ' in i:
+            key, _, value = i.partition(' ')
+            if key not in attrs:
+                attrs[key] = value
     return attrs
 
 def get_text(line):

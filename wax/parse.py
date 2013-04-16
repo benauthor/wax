@@ -1,51 +1,39 @@
+import sys
 import re
-import xml.etree.ElementTree as ET
 
 import __init__ as wax
 
-from analyze import count_indent
-
-#whitespace = re.compile('\s+')
-
-#class AttrDict(dict):
-#    def __init__(self, *args, **kwargs):
-#        super(AttrDict, self).__init__(*args, **kwargs)
-#        self.__dict__ = self
-#
-#    def __repr__(self):
-#        return f({'b-children': self.children, 'a-el': self.element} )
-
-#def count_indent(line):
-#    match = whitespace.match(line)
-#    try:
-#        length = len(match.group(0))
-#    except AttributeError:
-#        return 0
-#    else:
-#            if length % 4 != 0:
-#            raise Exception('bad indent')
-#        # maybe throw error on modulo != 0 ???
-#        return length / 4
-
-
-
+from analyze import analyze_lines, analyze_file
 
 
 def makenode(line, lineno, prev):
-    """tmp. make the object"""
-    name = line.strip()
-    indent, _ = count_indent(line)
-    return wax.WaxElement(tag=name, parent=None, line_num=lineno, indent=indent)
+    """Construct a node.
+    """
+    indent, _ = line.indent
+    attrib = line.attrs
+    node = wax.WaxElement(tag=line.element,
+                          parent=None,
+                          attrib=attrib,
+                          line_num=lineno,
+                          indent=indent)
+    node.text = ''
+    if line.text:
+        node.text += line.text
+    return node
+
 
 def parent_chain(indent, prev):
-    """recursively walk the parent chain and return the parent at given indent"""
+    """Recursively walk the parent chain and return the parent at given indent.
+    """
     if indent == prev.indent:
         return prev.parent
     else:
         return parent_chain(indent, prev.parent)
 
+
 def sortit(t, prev):
-    """given previous, decide what to do."""
+    """Given previous, decide what to do.
+    """
     if t.indent > prev.indent:
         # if my indent is greater than prev, i am a child of prev
         # TODO attributes may be on consecutive lines
@@ -61,36 +49,42 @@ def sortit(t, prev):
         t.parent.add_child(t)
 
 
-def parse_lines(iterable):
+def parse_data(iterable):
+    """Take data from an analyze method and make something of it.
+    """
     root = wax.WaxDocument()
     prev = root
     lineno = 0
     for line in iterable:
         lineno += 1
-        if line.strip(): # empty lines are allowed
+        if line.content.strip(): # empty lines are allowed
             n = makenode(line, lineno, prev)
             sortit(n, prev)
             prev = n
     return root
 
+
+def parse_string(input):
+    return parse_data(analyze_lines(input))
+
+
+def parse_file(infile):
+    return parse_data(analyze_file(infile))
+
+
 if __name__ == "__main__":
-#    try:
-#        infile = sys.argv[1]
-#    except IndexError:
-#        raise IndexError("You need to specify a file")
-    e = """
-    N
-        n
-            u
-    N
-    N
+    try:
+        infile = sys.argv[1]
+    except IndexError:
+        raise IndexError("You need to specify a file")
+    document = parse_file(infile)
+    a_string = ''.join(document.xml())
+    print a_string
 
-        n
-        n
-            u
-        n
-    """
+    #haxx for pretty-ish printing
+    from lxml import etree as LET
+    root = LET.fromstring("<root>%s</root>" % a_string)
+    print LET.tostring(root, pretty_print=True)
 
-    print e
-    document = parse_lines(e.splitlines())
-    print list(document.xml())
+    for i in analyze_file(infile):
+        print i
