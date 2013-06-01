@@ -16,6 +16,9 @@ class WaxDocument(object):
         for child in self.children:
             yield ET.tostring(child)
 
+    def all_the_xml(self):
+        return ''.join(self.xml())
+
     def add_child(self, item):
         self.children.append(item)
 
@@ -31,6 +34,10 @@ class WaxElement(ET.Element):
 
     def add_child(self, item):
         self.append(item)
+
+    def add_attrs(self, attrs):
+        for key in attrs.keys():
+            self.attrib[key] = attrs[key]
 
     def xml(self):
         return ET.tostring(self)

@@ -35,10 +35,13 @@ def sortit(t, prev):
     """Given previous, decide what to do.
     """
     if t.indent > prev.indent:
-        # if my indent is greater than prev, i am a child of prev
-        # TODO attributes may be on consecutive lines
-        prev.add_child(t)
-        t.parent = prev
+        # if my indent is greater than prev, i am a child of prev or i am an
+        # attribute of prev
+        if t.tag is None:
+            prev.add_attrs(t.attrib)
+        else:
+            prev.add_child(t)
+            t.parent = prev
     elif t.indent == prev.indent:
         # if my indent is same as prev, i am a child of whatever prev is a child of
         t.parent = prev.parent
@@ -86,5 +89,5 @@ if __name__ == "__main__":
     xml = minidom.parseString("<root>%s</root>" % a_string)
     print xml.toprettyxml()
 
-    for i in analyze_file(infile):
-        print i
+#    for i in analyze_file(infile):
+#        print i
