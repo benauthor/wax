@@ -1,2 +1,0 @@
-include COPYING README.md
-recursive-include wax *

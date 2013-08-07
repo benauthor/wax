@@ -20,15 +20,3 @@ than to type out all the brackets and quotes and crap. Ugh.
 
 This is still just a kernel of an idea. It does not actually work yet. Check
 back hourly for exciting updates!
-
-* * *
-
-Tests are written with [nose of yeti](https://github.com/delfick/nose-of-yeti).
-You'll need the noseOfYeti and nosetests packages. I like pinocchio too, for
-its nice spec-style output. I run tests like this:
-
-    nosetests --with-noy --with-spec --spec-color
-
-* * *
-
-Python 2.7 FTW
