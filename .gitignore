@@ -1,6 +1,1 @@
-*.swp
 *~
-*.pyc
-build/
-dist/
-wax.egg-info/
