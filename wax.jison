@@ -19,21 +19,21 @@
 
 DOCUMENT:
     PROLOG ELEMENTS EOF{ return $1 + $2; }
-    | ELEMENTS EOF { return $1; }
+    | ELEMENTS EOF { console.log($1); return $1; }
     ;
 
 PROLOG:
     '!' WORD { $$ = $2;}
     ;
-  
+
 ELEMENTS:
-    ELEMENTS ELEMENT { $$ = $1 + $2 + '<br/>'; }
-    | ELEMENT { $$ = $1 + '<br/>'; }
+    ELEMENTS ELEMENT { $$ = $1 + $2; }
+    | ELEMENT { $$ = $1; }
     ;
 
 ELEMENT:
-    NAME INDENT ELEMENTS DEDENT { $$ = '&lt;'+$1+'>' + $3 + '&lt;/'+$1+'>';}
-    | NAME { $$ = '&lt;'+$1+'/>'; }
+    NAME INDENT ELEMENTS DEDENT { $$ = '<'+$1+'>' + $3 + '</'+$1+'>';}
+    | NAME { $$ = '<'+$1+'/>'; }
     | TEXT { $$ = $1; }
     ;
 
@@ -49,14 +49,14 @@ NAME:
     ;
 
 ATTR:
-    ATNAME ATVAL { $$ = ' ' + $1 + '=' + $2; }
+    ATTRNAME ATTRVAL { $$ = ' ' + $1 + '=' + $2; }
     ;
 
-ATNAME:
+ATTRNAME:
     WORD { $$ = $1; }
     ;
 
-ATVAL:
+ATTRVAL:
     QUOTE WORDS QUOTE { $$ = $2; }
     |WORD { $$ = $1; }
     ;
