@@ -6,7 +6,6 @@ var fs = require('fs'),
 
 // load grammar from wax.json
 var wax = JSON.parse(fs.readFileSync("wax.json"));
-//console.log(wax);
 
 var grammar = {"bnf": wax},
     parser = new Parser(grammar),
