@@ -25,9 +25,40 @@ var grammar = {"bnf": wax},
 '!'                     return '!';
 <<EOF>>                 return 'EOF';
 */
-lexer.addRule(/\s+/, function () {}); // this will change for significant whitespace
-lexer.addRule(/\[/, function () { return 'INDENT'; }); // ditto
-lexer.addRule(/\]/, function () { return 'DEDENT'; }); // ditto
+var spacesPerIndent = 4;
+var lastIndent = 0;
+// lexer.addRule(/\n/, function () {
+//     console.log('nl');
+// });
+// lexer.addRule(/\[/, function () { return 'INDENT'; }); // ditto
+// lexer.addRule(/\]/, function () { return 'DEDENT'; }); // ditto
+lexer.addRule(/\s+/, function (match) {
+    var indent,
+        indentDiff,
+        spaces = match.replace(/\n/g, ''),
+        tokens = [];
+    if (match[0] === "\n") {
+        indent = spaces.length / spacesPerIndent;
+        if (parseInt(indent, 10) !== indent) {
+            throw "Bad indentation!"; // TODO line numbers
+        }
+        if (indent > lastIndent) {
+            indentDiff = indent - lastIndent;
+            tokens.push("INDENT");
+            lastIndent = indent;
+            return tokens;
+        } else if (indent < lastIndent) {
+            indentDiff = lastIndent - indent;
+            for (var i = 0; i < indentDiff; i++) {
+                tokens.push("DEDENT");
+            }
+            lastIndent = indent;
+            return tokens;
+        }
+
+
+    }
+}); // this will change for significant whitespace
 lexer.addRule(/[a-zA-Z0-9:${}]+/, function (lexeme) {
     this.yytext = lexeme;
     return "WORD";
