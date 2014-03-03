@@ -1,11 +1,12 @@
 /*globals console: false, process: false */
 var fs = require('fs'),
     Parser = require("jison").Parser,
-    Lexer = require("lex");
+    Lexer = require("lex"),
+    html = require("html");
 
 // load grammar from wax.json
 var wax = JSON.parse(fs.readFileSync("wax.json"));
-console.log(wax);
+//console.log(wax);
 
 var grammar = {"bnf": wax},
     parser = new Parser(grammar),
@@ -46,5 +47,7 @@ fs.readFile(process.argv[2], 'utf8', function (err,data) {
     if (err) {
         return console.log(err);
     }
-    parser.parse(data);
+    var parsedWax = parser.parse(data),
+        pretty = html.prettyPrint(parsedWax, {indent_size: 4});
+    console.log(pretty);
 });
