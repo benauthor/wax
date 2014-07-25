@@ -55,10 +55,8 @@ lexer.addRule(/\s+/, function (match) {
             lastIndent = indent;
             return tokens;
         }
-
-
     }
-}); // this will change for significant whitespace
+});
 lexer.addRule(/[a-zA-Z0-9:${}]+/, function (lexeme) {
     this.yytext = lexeme;
     return "WORD";
